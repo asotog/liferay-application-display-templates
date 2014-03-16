@@ -10,8 +10,8 @@ Additionally the articles that are going to be displayed within this template wi
 
 Once selected this display template from asset publisher, this template will receive the following configuration settings to start working:
 
-- delta (number of items to be displayed per page or per scrolling in this template)
-- scopes (scopes from the sites where are going to be retrieved the entries, by default is current site where asset publisher is placed)
-- journal article template (which article template is going to be used to filter the entries that are going to be displayed, should be selected a template created with the article structure specified above)
+- <strong>delta</strong> (number of items to be displayed per page or per scrolling in this template)
+- <strong>scopes</strong> (scopes from the sites where are going to be retrieved the entries, by default is current site where asset publisher is placed)
+- <strong>journal article template</strong> (which article template is going to be used to filter the entries that are going to be displayed, should be selected a template created with the article structure specified above)
 
 ![Alt text](http://asotog.github.io/liferay-application-display-templates/screenshots/screenshot1.png)
