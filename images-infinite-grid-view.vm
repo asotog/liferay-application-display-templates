@@ -1,0 +1,133 @@
+#if (!$entries.isEmpty())
+    
+    ## BEGIN: READ asset publisher preferences
+
+    ## READ Delta
+    #set ($config_Delta = $portletPreferences.delta)
+    #foreach ($delta in $portletPreferences.delta )
+        #set ($config_Delta = $delta)
+    #end
+    
+    ## READ Scopes
+    #set ($config_Scopes = "")
+    #set ($count = 0)
+    #foreach ($scopeId in $portletPreferences.scopeIds )
+        #set ($currentScope = $scopeId.replace("Group_", ""))
+        #if ($currentScope == "default")
+            #set ($currentScope = $themeDisplay.getScopeGroupId())
+        #end
+        
+        #set ($config_Scopes = $config_Scopes + $currentScope)
+        #if ($count < $portletPreferences.scopeIds.size() - 1)
+            #set ($config_Scopes = $config_Scopes + ",")
+        #end
+        #set ($count = $count + 1)
+    #end
+    
+    ## READ anyClassTypeJournalArticleAssetRendererFactory
+    #set ($config_ClassTypesIds = "")
+    #set ($count = 0)
+    #foreach ($classTypeId in $portletPreferences.anyClassTypeJournalArticleAssetRendererFactory )
+        #set ($config_ClassTypesIds = $config_ClassTypesIds + $classTypeId)
+        #if ($count < $portletPreferences.anyClassTypeJournalArticleAssetRendererFactory.size() - 1)
+            #set ($config_ClassTypesIds = $config_ClassTypesIds + ",")
+        #end
+        #set ($count = $count + 1)
+    #end
+    
+    ## END: READ asset publisher preferences
+
+    
+    <ul class="images-infinite-grid-view thumbnails">
+        ## grid view content loaded w/ js
+    </ul>
+    
+    
+    <script type="text/javascript" src="https://rawgithub.com/asotog/y-commons/master/build/gallery-y-common-infinite-scroll/gallery-y-common-infinite-scroll-min.js"></script>
+
+    <script type="text/javascript">
+    AUI().use('gallery-y-common-infinite-scroll', 'datatype-xml', 'transition', function (A) {
+
+        /* js configuration */
+        var itemTemplate = '<li class="span4"><div class="thumbnail">' +
+                               '<img src="{image}" alt="">' +
+                                   '<div class="caption">' +
+                                       '<h4>{titleCurrentValue}</h4>' +
+                                       '<p>{description}</p>' +
+                                    '</div>' +
+                           '</div></li>';
+                             
+        var offset = $config_Delta;
+        var groupIds = [$config_Scopes];
+        var classTypesIds = [$config_ClassTypesIds];
+        
+        /* infinite scroll instance */
+        var infiniteScroll = new A.InfiniteScroll({
+            requestCustomData: function (callback) {
+                Liferay.Service(
+                    {
+                        '$currentEntry = /assetentry/get-entries': {
+                            entryQuery: {
+                                start: this.currentOffset - offset,
+                                end: this.currentOffset,
+                                groupIds: groupIds,
+                                classTypeIds: classTypesIds
+                            },
+
+                            '$article = /journalarticle/get-latest-article': {
+                                '@resourcePrimKey': '$currentEntry.classPK'
+                            }
+                        }
+                    },
+                    function (entries) {
+                        callback(entries);
+                    }
+                );
+            },
+            container: A.one('ul.images-infinite-grid-view'),
+            itemTemplate: itemTemplate,
+            initialize: true,
+            offset: offset,
+            itemPreProcessor: function(item) {
+                var articleXmlContent = item.article.content;
+                var articleXml = A.XML.parse(articleXmlContent);
+                if (A.UA.ie && A.UA.ie <= 9) {
+                    item.description = articleXml.getElementsByTagName('dynamic-element')[0].childNodes[0].text;
+                    item.image = articleXml.getElementsByTagName('dynamic-element')[2].childNodes[0].text;
+                } else {
+                    item.description = articleXml.getElementsByTagName('dynamic-element')[0].childNodes[1].textContent;
+                    item.image = articleXml.getElementsByTagName('dynamic-element')[2].childNodes[1].textContent;
+                }
+                
+                
+                return item;
+            }
+        });
+        
+        infiniteScroll.on('infinite-scroll:loading', function (e) {
+            console.info('loading');
+        });
+        infiniteScroll.on('infinite-scroll:finished', function (e) {
+            infiniteScroll.get('container').all('li').transition({
+                easing: 'ease-out',
+                duration: 1,
+                opacity: 1
+            });
+        });
+        infiniteScroll.on('infinite-scroll:no-more-results', function (e) {
+            console.info('no-more-results');
+        });
+    });
+    </script>
+    
+    <style>
+        ul.images-infinite-grid-view li {
+            display: inline-block !important;
+            height: 100%;
+            vertical-align: top;
+            float: none !important;
+            margin-left: 1.5% !important;
+            opacity: 0;
+        }
+    </style>
+#end
