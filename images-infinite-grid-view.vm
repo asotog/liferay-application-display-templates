@@ -43,7 +43,7 @@
     </ul>
     
     
-    <script type="text/javascript" src="https://rawgithub.com/asotog/y-commons/master/build/gallery-y-common-infinite-scroll/gallery-y-common-infinite-scroll-min.js"></script>
+    <script type="text/javascript" src="https://rawgithub.com/asotog/y-commons/master/build/gallery-y-common-infinite-scroll/gallery-y-common-infinite-scroll.js"></script>
 
     <script type="text/javascript">
     AUI().use('gallery-y-common-infinite-scroll', 'datatype-xml', 'transition', function (A) {
